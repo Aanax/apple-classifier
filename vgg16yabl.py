@@ -42,15 +42,7 @@ import six
 
 from keras.regularizers import l2, activity_l2
 
-#import signal
-#import sys
 
-#def signal_handler(signal, frame):
-#    joblib.dump(seqmodel.get_weights(),"rewrite.pkl",compress=9)
-#    print('You pressed Ctrl+C!')
-#    sys.exit(0)
-
-#signal.signal(signal.SIGINT, signal_handler)
 
 TH_WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg16_weights_th_dim_ordering_th_kernels.h5'
 TF_WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg16_weights_tf_dim_ordering_tf_kernels.h5'
@@ -180,10 +172,6 @@ def VGG16(include_top=False, weights='imagenet',
             if K.backend() == 'theano':
                 convert_all_kernels_in_model(model)
 
-#    model.add(Flatten())
-#    model.add(Dense(4096, activation='relu', name='fc1'))#(x)
-#    model.add(Dense(4096, activation='relu', name='fc2'))
-#    model.add(Dense(2, activation='softmax', name='predictions'))
 
     return model
 
@@ -223,12 +211,7 @@ def sequential_from_Model(m,n_classes):
 
     s.add(Flatten())
     
-    #for i in s.layers:
-    #    i.trainable = False
-    #s.add(Dense(4400,activation = 'sigmoid',W_regularizer=l2(0.005),activity_regularizer=activity_l2(0.005)))
-    #s.add(Dropout(0.5))
-    #s.add(Dense(2400,activation = 'sigmoid',W_regularizer=l2(0.005),activity_regularizer=activity_l2(0.005)))
-    #s.add(Dropout(0.5))
+
     s.add(Dense(100,activation = 'sigmoid',W_regularizer=l2(0.05),activity_regularizer=activity_l2(0.05)))
 
     s.add(Dense(30,activation = 'sigmoid',W_regularizer=l2(0.05),activity_regularizer=activity_l2(0.05)))
@@ -236,19 +219,13 @@ def sequential_from_Model(m,n_classes):
     s.add(Dense(n_classes,activation='softmax',W_regularizer=l2(0.05),activity_regularizer=activity_l2(0.05)))
 
     
-
-    #print("ALL DA LAYERS=========")
-    #print(s.layers)
-    #for j in range(0,len(s.layers)):
-    #    print(j)
-    #    print(s.layers[j].trainable)
     
 
 
     return s
 
 
-#model.fit(X,labels,n_epoch)
+
 
 
 def trainme(add_model,path,n_classes,n_epochs):
@@ -286,15 +263,8 @@ def trainme(add_model,path,n_classes,n_epochs):
 
     for epoch in range(n_epochs):
         files = six.moves.zip_longest(*dirs)
-
-        #    tstkol=0.0
-        #for l in files:
-        #    tstkol+=1
-        #print("LENZIP------",tstkol)
         
         for filename in files:
-            #Namefil1 = os.path.join(path1, filename1)
-            #Namefil2 = os.path.join(path2, filename2)
             Namefils=[]
             for j in range(0,len(pathn)):
                 if filename[j] is not None:
@@ -305,8 +275,7 @@ def trainme(add_model,path,n_classes,n_epochs):
                     print("DENIED  " + Namefil)
                     #print ("No file "+Namefil)
                     continue
-                #print(model.predict(np.reshape(np.array(misc.imread(Namefil)),(-1,1,120,120))   ))
-                #print("[INFO] loading and preprocessing image...")
+
                 iteration+=1
                 imag = image.load_img(Namefil, target_size=(224, 224))
                 imag = image.img_to_array(imag)
@@ -322,15 +291,7 @@ def trainme(add_model,path,n_classes,n_epochs):
                         label[i] = 1.0
 
                 label = np.reshape(label,(-1,n_classes))
-                #if "Cropped3" in Namefil:
-                #    label=np.reshape(np.array([1,0]),(-1,2))
-                #else:
-                #    label=np.reshape(np.array([0,1]),(-1,2))
-                    #print ("!!!!" , np.array(model.predict(image)[0]).shape)
-                    #print ("!!!!222222222!!" , np.array(model.predict(image)).shape)   
-                #preds = np.reshape(np.array(model.predict(image)[0]),(-1,512,7,7))
-                #if (iteration % 200) == 0:
-                #    print("Time to unfreeze")
+  
                     for k in range(0,len(add_model.layers)):
                         if add_model.layers[k].trainable == True and k >= 2 and add_model.layers[k-1].trainable == False:
                             add_model.layers[k-1].trainable=True
@@ -340,18 +301,7 @@ def trainme(add_model,path,n_classes,n_epochs):
                             print("TRYING TO PUT IN!!!",trnbl)
                             add_model.compile(optimizer = opt, loss='categorical_crossentropy',metrics = ['accuracy'])
                             add_model.set_weights(weights)
-                #            break
-
-                #trainable=0
-                #for j in add_model.layers:
-                #    if j.trainable:
-                #        trainable+=1
-                
-                #print("----------CHECK----------")
-                #for j in range(0,len(add_model.layers)):
-                #    print(j)
-                #    print(add_model.layers[j].trainable)
-                #print("--------------------------")
+       
 
 
                 if iteration % 70 == 0:
@@ -366,24 +316,20 @@ def trainme(add_model,path,n_classes,n_epochs):
 
 
 
-                #print("TRAINABLE",trainable)
 
 
 
                 print(add_model.train_on_batch(imag,label))
-                #print(name)
-                #print(Namefil)
+                
                 print("Iteration",iteration)
-                #print(totalvid)
-                #print(add_model.predict(imag))
+      
                 print("CURRENT LR ", K.get_value(opt.lr))
                 print("CURRENT SCORE", res)
-                #if trnbl>=20:
+                
 
         K.set_value(opt.lr, 0.5 * K.get_value(opt.lr))
 
-                #WEIGHTS = copy.deepcopy(add_mo)
-                #print("kol",kol)
+             
     sns.plt.plot(range(0,len(accs)),accs)
     sns.plt.show()
     return add_model
@@ -407,8 +353,7 @@ def sample(eps,pathto):
                 if not os.path.isfile(Namefil):
                     #print ("No file "+Namefil)
                     continue
-                #print(model.predict(np.reshape(np.array(misc.imread(Namefil)),(-1,1,120,120))   ))
-                #print("[INFO] loading and preprocessing image...")
+               
                 if np.random.random() < eps:
                     shutil.move(Namefil,pathto)
                     if name == 'healthy':
@@ -468,36 +413,17 @@ def testme(seqmodel,path):
             imag = np.expand_dims(imag, axis=0)
             imag = preprocess_input(imag)
                 
-            #label=np.reshape(np.array([1,0]),(-1,2))
-            
-            #preds = np.reshape(np.array(model.predict(image)[0]),(-1,512,7,7))
+       
             pr=seqmodel.predict(imag)
             #print(pr)
             print("Iteration",iteration)
             
-            #if np.argmax(pr[0]) == 0:
-            #    if "Cropped3" in Namefil:
-            #        tp+=1
-            #    else:
-            #        fp+=1
-            #else:
-            #    if "Cropped2" in Namefil:
-            #        tn+=1
-            #    else:
-            #        fn+=1
+ 
             for i in range(0,len(pathn)):
                 if pathn[i] in Namefil and np.argmax(pr[0])==i:
                     correct+=1.0
                            
 
-    #print("OK",ok)
-    #print("NOTOK",notok)
-    #print("Accuracy", (ok/(notok+ok)))
-    #print("Prescision",(tp/(tp+fp)))
-    #print("Recall",(tp/(tp+fn)))
-    #print("AccCheck",((tp+tn)/(tp+tn+fp+fn)))
-    #print(tp,fp,tn,fn)
-    #return (ok/(notok+ok))
     print("Accuracy",correct/iteration)
     return(correct/iteration)
     
@@ -518,8 +444,7 @@ if __name__ == '__main__':
 
         if not os.path.isdir(path+"tst"):
             print("No tst directory")
-            #os.makedirs(path+"tst")
-            #sample(0.2,path+"tst")
+        
 
 
 
@@ -534,9 +459,7 @@ if __name__ == '__main__':
 
         train_datagen = image.ImageDataGenerator(
             horizontal_flip=False)
-        #train_datagen1 = image.ImageDataGenerator(
-        #    horizontal_flip=False)
-
+     
         
 
 
@@ -548,51 +471,10 @@ if __name__ == '__main__':
         color_mode='rgb',
         class_mode='categorical')
 
-        #test_generator = train_datagen1.flow_from_directory(
-        #"/media/aanax/5ADEB1D6DEB1AAA1/Documents and Settings/Andrew/Desktop/MACHINE_LEARNING/CARDIOHER (1)/ToMakeDataset/PNG",
-        #"/home/aanax/Desktop/YABLOKI/Totest/", 
-        #target_size= (224,224) ,
-        #batch_size=1,
-        #color_mode='rgb',
-        #class_mode='categorical')
-
-        #seqmodel=trainme(seqmodel)
-        #seqmodel.fit_generator(
-        #    train_generator,
-        #    samples_per_epoch = 20,
-        #    nb_epoch = 20,
-        #    validation_data=test_generator,
-        #    nb_val_samples=148)
-        
 
         print("Success")
 
-        #seqmodel.predict("/media/aanax/5ADEB1D6DEB1AAA1/Documents and Settings/Andrew/Desktop/MACHINE_LEARNING/CARDIOHER (1)/ToMakeDataset")
         joblib.dump(seqmodel.get_weights(),"rewrite.pkl",compress=9)
-
-        #im1 = Image.open("pict14_1_0.bmp")
-        #im1=im1.resize((244,244))
-        #im1_mtx = np.array(im1)
-        
-        #print(im1_mtx.shape)
-        #k=0
-        #for i in train_generator:
-        #    k+=1
-            #print(seqmodel.predict(np.reshape(i,(-1,3,224,224))   ))
-            #print(i.shape)
-        #    print("=================")
-        #    print("=================")
-        #    print("=================")
-        #    print(i[0].shape)
-        #    print("=================")
-        #    print("=================")
-        #    print("=================")
-        #    print(seqmodel.predict(np.array(i[0])))
-        #    Image.fromarray(i[0][0][0]).show()
-
-        #    if k >= 2: 
-        #        break
-        #        break
 
 
 
@@ -625,9 +507,6 @@ if __name__ == '__main__':
 
         print("TESTSCORE",acc1)
         print("TRAINSCORE",acc2)
-    #print(seqmodel.predict(np.reshape(np.array(misc.imread("pict8_0_3.bmp")),(-1,3,224,224))   ))
-    #preds = seqmodel.predict(x)
-    #print('Predicted:', decode_predictions(preds))
 
 
 
