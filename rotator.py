@@ -13,8 +13,6 @@ ap.add_argument("--stopat",required=False,help="num of images to be turned")
 ap.add_argument("-s","--savepath",required=False,help="path where to save cropped images (specify if it is needed to save)")
 args = vars(ap.parse_args())
 
-
-#print(args)
 if args["path"] is None:
 	args["path"] = "./"
 if args["path"][0:4] != "home":
@@ -27,22 +25,16 @@ if args["savepath"] is not None:
 
 if args["expand"] is None:
     args["expand"]=False
-#if args["format"] is None:
-#	args["format"] = "JPG"
+
 
 args["rotations"] = [float(i) for i in args["rotations"].split(" ")]
-#for i in range(0,int(args["count"])):
-#	Namefil = args["path"] + args["namebase"]+str(i)+"."+args["format"]
-#	if not os.path.isfile(Namefil):
-#		print ("No file "+Namefil)
-#		continue
+
 k=0
 
 print("Working with",args["path"])
 
 for filename in os.listdir(args["path"]):
     if filename.startswith(args["namebase"]): 
-        #print(os.path.join(directory, filename))
         fullname = os.path.join(args["path"], filename)
         print("Processing ",fullname)
         im = Image.open(fullname)
@@ -51,20 +43,13 @@ for filename in os.listdir(args["path"]):
         for rot in args["rotations"]:
             print("ROT",rot)
             ims.append(im.rotate(rot,expand = args["expand"]))
-        #for df in ims:
-        #    df.show()
 
-        #im.show()
-        #break
         k+=1
         l=0
-        #ims[0].show()
-        #break
+
         if args["savepath"] is not None:
             for pic in ims:
-                l+=1
-                #pic.show()
-                #break        
+                l+=1   
                 im.save(args["savepath"]+"/Rotatedimg"+str(k)+"_"+str(l)+".png")
         if args["stopat"] is not None:
             if k>= int(args["stopat"]):
